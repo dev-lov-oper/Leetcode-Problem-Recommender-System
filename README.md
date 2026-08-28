@@ -1,60 +1,70 @@
-LeetCode Problem Recommender
+# LeetCode Problem Recommender
 
-A personalized LeetCode problem recommendation system using KNN. It analyzes solved problems, topics, difficulty, and acceptance rate to recommend relevant unsolved problems.
+> A personalized recommendation system that uses **KNN-based similarity** to recommend the next LeetCode problems you should solve.
 
-Current Stack
+## 🚀 Overview
 
-Backend: Django
+The system analyzes your LeetCode solving history and recommends **unsolved problems** based on:
 
-Database: SQLite
+* 🏷️ Problem topics
+* 📊 Difficulty
+* 📈 Acceptance rate
+* 🕒 Recent solving activity
+* 🤖 KNN-based similarity
 
-ML: Python, NumPy, scikit-learn, joblib
+The goal is to make problem selection personalized instead of randomly choosing problems.
 
-Frontend: React
+---
 
-Data: LeetCode GraphQL API
+## 🧠 How It Works
 
-How It Works
+```text
+            LeetCode
+                │
+                ▼
+       Problems + Submissions
+                │
+                ▼
+          Django + SQLite
+                │
+                ▼
+        Feature Engineering
+                │
+                ▼
+        Problem Feature Vectors
+                │
+                ▼
+              KNN
+                │
+                ▼
+       Personalized User Profile
+                │
+                ▼
+    Similarity + Difficulty Score
+                │
+                ▼
+        Top Unsolved Problems
+```
 
-LeetCode
-   ↓
-Problems + submissions
-   ↓
-Django / SQLite
-   ↓
-Feature vectors
-   ↓
-KNN
-   ↓
-Personalized user profile
-   ↓
-Similarity + difficulty scoring
-   ↓
-Top unsolved problems
+---
 
-Current ML Pipeline
+## 🛠️ Tech Stack
 
-Each problem is represented using:
+| Component        | Technology           |
+| ---------------- | -------------------- |
+| Backend          | Django               |
+| Database         | SQLite               |
+| Machine Learning | Scikit-learn         |
+| Data Processing  | NumPy                |
+| Model Storage    | Joblib               |
+| Frontend         | React                |
+| Data Source      | LeetCode GraphQL API |
 
-Topic tags
+---
 
-Difficulty
+## 📂 Project Structure
 
-Acceptance rate
-
-The current dataset contains approximately 4,000+ problems and the feature matrix is generated automatically.
-
-The user profile is built from solved problems using recency-weighted averaging, giving newer solves more influence.
-
-Recommendations are then ranked using:
-
-80% similarity
-20% difficulty suitability
-
-Already-solved problems are filtered out.
-
-Project Structure
-
+```text
 leetcode_rec_sys/
 │
 ├── data/
@@ -82,17 +92,46 @@ leetcode_rec_sys/
 │
 └── frontend/
     └── React application
+```
 
-Django API
+---
 
-Current endpoint:
+## 📊 ML Pipeline
 
+Each LeetCode problem is converted into a numerical **feature vector** using:
+
+* 🏷️ Topic tags
+* 🎯 Difficulty
+* 📈 Acceptance rate
+
+The current dataset contains **4,000+ LeetCode problems**.
+
+The user's profile is generated from their solved problems using **recency-weighted averaging**, so recent solving activity has greater influence.
+
+### Recommendation Score
+
+```text
+Final Score =
+    80% × Similarity
+    +
+    20% × Difficulty Suitability
+```
+
+Already-solved problems are automatically excluded.
+
+---
+
+## 🔌 API
+
+### Get Personalized Recommendations
+
+```http
 GET /api/recommend/for-me/
+```
 
-Returns the user's top recommended unsolved problems.
+Example response:
 
-Example:
-
+```json
 {
   "count": 10,
   "recommendations": [
@@ -105,90 +144,98 @@ Example:
     }
   ]
 }
+```
 
-Running Locally
+---
 
-1. Install dependencies
+## ⚙️ Setup
 
+### 1. Install Dependencies
+
+```bash
 pip install django numpy scikit-learn joblib requests
+```
 
-2. Fetch LeetCode data
+### 2. Fetch LeetCode Data
 
 From the project root:
 
+```bash
 python data/fetch_lc.py
+```
 
-3. Set up Django database
+### 3. Setup Database
 
+```bash
 cd backend
+
 python manage.py makemigrations
 python manage.py migrate
+
 python manage.py import_problems
 python manage.py import_submissions
+```
 
-4. Train the KNN model
+### 4. Train KNN
 
 From the project root:
 
+```bash
 python ml/knn_model.py
+```
 
-5. Start Django
+### 5. Start Django
 
+```bash
 cd backend
 python manage.py runserver
+```
 
-API:
+API will be available at:
 
+```text
 http://127.0.0.1:8000/api/recommend/for-me/
+```
 
-Current Status
+---
 
-LeetCode problem data fetching
+## ✅ Current Progress
 
-Problem database import
+* [x] LeetCode problem data fetching
+* [x] Problem database
+* [x] Submission database
+* [x] Feature engineering
+* [x] Problem vectors
+* [x] KNN model
+* [x] Recency-weighted user profile
+* [x] Difficulty-aware recommendations
+* [x] Personalized recommendation API
+* [ ] React dashboard
+* [ ] Similar-problem API
+* [ ] Topic statistics
+* [ ] Recommendation explanations
+* [ ] Deployment
+* [ ] Automated data refresh
 
-Submission database import
+---
 
-Feature engineering
+## 🔮 Future Improvements — V2
 
-KNN model
+* 🎯 Topic diversity
+* 🧩 Better historical submission tracking
+* ⏱️ Solve time and attempt-based features
+* 🧠 Problem-statement embeddings
+* 🔀 Hybrid metadata + embedding similarity
+* 🏢 Company-based filtering
+* 📈 Recommendation feedback loop
+* 🔄 Automated model retraining
 
-Recency-weighted user profile
+---
 
-Difficulty-aware ranking
+## 🎯 Project Goal
 
-Personalized recommendation API
+Build a practical recommendation system that answers:
 
-React dashboard
+> **"I've solved these problems. What should I solve next?"**
 
-Similar-problem API
-
-Topic statistics API
-
-Recommendation explanations
-
-Deployment
-
-Automated data refresh
-
-V2 Ideas
-
-Topic diversity in recommendations
-
-Better historical submission data
-
-Solve time / attempts
-
-Problem statement embeddings
-
-Hybrid metadata + embedding similarity
-
-Company-based filtering
-
-Recommendation feedback loop
-
-Scheduled model/data refresh
-
-Note
-
-The current version is intentionally simple and explainable. The ML model uses engineered metadata features rather than semantic embeddings.
+The current version focuses on a **simple, explainable KNN approach** using engineered problem metadata rather than semantic embeddings.
