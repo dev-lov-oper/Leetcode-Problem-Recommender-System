@@ -1,93 +1,236 @@
 # LeetCode Problem Recommender
 
-An ML-based system that recommends the **next LeetCode problem to solve** based on a user's solved problems and problem-solving patterns.
+> A personalized recommendation system that uses **KNN-based similarity** to recommend the next LeetCode problems you should solve.
 
-The system uses **K-Nearest Neighbors (KNN)** to find similar problems and generate personalized recommendations.
+## 🚀 Overview
 
-## Features
+The system analyzes your LeetCode solving history and recommends **unsolved problems** based on:
 
-* Fetch LeetCode problem and submission data
-* Track solved problems
-* Analyze topics and difficulty
-* Recommend similar unsolved problems
-* Personalized recommendations based on solving history
-* Topic-wise solving statistics
-* "Why this?" explanation for recommendations
-* React dashboard
+* 🏷️ Problem topics
+* 📊 Difficulty
+* 📈 Acceptance rate
+* 🕒 Recent solving activity
+* 🤖 KNN-based similarity
 
-## How It Works
+The goal is to make problem selection personalized instead of randomly choosing problems.
+
+---
+
+## 🧠 How It Works
 
 ```text
-LeetCode Data
-      ↓
-User Solving History
-      ↓
-Feature Extraction
-      ↓
-KNN Recommendation
-      ↓
-Unsolved Similar Problems
-      ↓
-Next Problem to Solve
+            LeetCode
+                │
+                ▼
+       Problems + Submissions
+                │
+                ▼
+          Django + SQLite
+                │
+                ▼
+        Feature Engineering
+                │
+                ▼
+        Problem Feature Vectors
+                │
+                ▼
+              KNN
+                │
+                ▼
+       Personalized User Profile
+                │
+                ▼
+    Similarity + Difficulty Score
+                │
+                ▼
+        Top Unsolved Problems
 ```
 
-## Tech Stack
+---
 
-* **Frontend:** React
-* **Backend:** Django + Django REST Framework
-* **Database:** SQLite / PostgreSQL
-* **ML:** Python + Scikit-learn
-* **Algorithm:** K-Nearest Neighbors
-* **Data:** LeetCode GraphQL
+## 🛠️ Tech Stack
 
-## Project Structure
+| Component        | Technology           |
+| ---------------- | -------------------- |
+| Backend          | Django               |
+| Database         | SQLite               |
+| Machine Learning | Scikit-learn         |
+| Data Processing  | NumPy                |
+| Model Storage    | Joblib               |
+| Frontend         | React                |
+| Data Source      | LeetCode GraphQL API |
+
+---
+
+## 📂 Project Structure
 
 ```text
-leetcode-recommender/
+leetcode_rec_sys/
 │
-├── data/          # LeetCode data collection
-├── ml/            # Feature engineering & KNN
-├── backend/       # Django REST API
-├── frontend/      # React application
+├── data/
+│   ├── fetch_lc.py
+│   ├── problems.json
+│   └── submissions.json
 │
-├── requirements.txt
-└── README.md
+├── ml/
+│   ├── featurize.py
+│   ├── user_profile.py
+│   ├── knn_model.py
+│   ├── recommend.py
+│   └── models/
+│       ├── knn.pkl
+│       ├── topic_encoder.pkl
+│       └── features.npy
+│
+├── backend/
+│   ├── manage.py
+│   ├── config/
+│   └── recommender/
+│       ├── models.py
+│       ├── views.py
+│       └── urls.py
+│
+└── frontend/
+    └── React application
 ```
 
-## Recommendation Modes
+---
 
-### Similar Problems
+## 📊 ML Pipeline
 
-Select a problem and get similar unsolved problems.
+Each LeetCode problem is converted into a numerical **feature vector** using:
 
-### For You
+* 🏷️ Topic tags
+* 🎯 Difficulty
+* 📈 Acceptance rate
 
-Get recommendations based on your recent solving history, difficulty, and topics.
+The current dataset contains **4,000+ LeetCode problems**.
 
-## API
+The user's profile is generated from their solved problems using **recency-weighted averaging**, so recent solving activity has greater influence.
+
+### Recommendation Score
 
 ```text
+Final Score =
+    80% × Similarity
+    +
+    20% × Difficulty Suitability
+```
+
+Already-solved problems are automatically excluded.
+
+---
+
+## 🔌 API
+
+### Get Personalized Recommendations
+
+```http
 GET /api/recommend/for-me/
-GET /api/recommend/similar/<problem_id>/
-GET /api/problems/
-GET /api/problems/<problem_id>/
-GET /api/stats/
 ```
 
-## Development Roadmap
+Example response:
 
-* [ ] LeetCode data collection
-* [ ] Django database setup
-* [ ] Feature engineering
-* [ ] KNN recommendation model
-* [ ] Django REST API
-* [ ] React dashboard
-* [ ] Personalized recommendations
-* [ ] Deployment
-* [ ] Automated data/model updates
+```json
+{
+  "count": 10,
+  "recommendations": [
+    {
+      "leetcode_id": 46,
+      "title": "Permutations",
+      "difficulty": "Medium",
+      "similarity": 0.86,
+      "score": 0.89
+    }
+  ]
+}
+```
 
-## Goal
+---
 
-Build a personalized LeetCode practice assistant that learns from your solving history and continuously recommends what you should solve next.
+## ⚙️ Setup
+
+### 1. Install Dependencies
+
+```bash
+pip install django numpy scikit-learn joblib requests
+```
+
+### 2. Fetch LeetCode Data
+
+From the project root:
+
+```bash
+python data/fetch_lc.py
+```
+
+### 3. Setup Database
+
+```bash
+cd backend
+
+python manage.py makemigrations
+python manage.py migrate
+
+python manage.py import_problems
+python manage.py import_submissions
+```
+
+### 4. Train KNN
+
+From the project root:
+
+```bash
+python ml/knn_model.py
+```
+
+### 5. Start Django
+
+```bash
+cd backend
+python manage.py runserver
+```
+
+API will be available at:
+
+```text
+http://127.0.0.1:8000/api/recommend/for-me/
+```
+
+---
+
+## ✅ Current Progress
+
+* [x] LeetCode problem data fetching
+* [x] Problem database
+* [x] Submission database
+* [x] Feature engineering
+* [x] Problem vectors
+* [x] KNN model
+* [x] Recency-weighted user profile
+* [x] Difficulty-aware recommendations
+* [x] Personalized recommendation API
 
 
+---
+
+## 🔮 Future Improvements — V2
+
+* 🎯 Topic diversity
+* 🧩 Better historical submission tracking
+* ⏱️ Solve time and attempt-based features
+* 🧠 Problem-statement embeddings
+* 🔀 Hybrid metadata + embedding similarity
+* 🏢 Company-based filtering
+* 📈 Recommendation feedback loop
+* 🔄 Automated model retraining
+
+---
+
+## 🎯 Project Goal
+
+Build a practical recommendation system that answers:
+
+> **"I've solved these problems. What should I solve next?"**
+
+The current version focuses on a **simple, explainable KNN approach** using engineered problem metadata rather than semantic embeddings.
