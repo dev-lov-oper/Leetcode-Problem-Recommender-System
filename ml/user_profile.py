@@ -59,77 +59,97 @@ def get_solved_vectors():
 
     return solved_vectors
 
-def build_user_profile():
-
-    X, problems, mlb = build_feature_matrix()
-
-    submissions = get_solved_submissions()
-
-    if not submissions:
+def build_user_profile_from_slugs(solved_slugs, X, problems):
+    """
+    Builds a weighted user feature vector from a list of solved problem titleSlugs.
+    Recency decay weight = 1 / (rank + 1).
+    """
+    if not solved_slugs:
         return None
 
-    # Map Django problem ID → feature-vector index
-    problem_index = {
-        problem.id: index
+    # Map problem titleSlug -> index in feature matrix
+    slug_to_index = {
+        problem.slug: index
         for index, problem in enumerate(problems)
     }
 
     weighted_vectors = []
     weights = []
 
-    for rank, submission in enumerate(submissions):
+    # Filter unique slugs preserving recency order
+    seen = set()
+    unique_slugs = []
+    for slug in solved_slugs:
+        if slug not in seen:
+            seen.add(slug)
+            unique_slugs.append(slug)
 
-        problem_id = submission.problem.id
-
-        if problem_id not in problem_index:
+    for rank, slug in enumerate(unique_slugs):
+        if slug not in slug_to_index:
             continue
-
-        index = problem_index[problem_id]
-
+        index = slug_to_index[slug]
         vector = X[index]
-
-        # Newer problems get higher weight
-        weight = 1 / (rank + 1)
-
+        weight = 1.0 / (rank + 1)
         weighted_vectors.append(vector * weight)
         weights.append(weight)
 
     if not weighted_vectors:
         return None
 
-    user_vector = (
-        np.sum(weighted_vectors, axis=0)
-        / np.sum(weights)
-    )
-
+    user_vector = np.sum(weighted_vectors, axis=0) / np.sum(weights)
     return user_vector
 
 
+def get_difficulty_profile_from_slugs(solved_slugs, problems):
+    """
+    Returns a Counter of problem difficulties for solved problem titleSlugs.
+    """
+    slug_to_diff = {
+        problem.slug: problem.difficulty
+        for problem in problems
+    }
+    difficulties = [
+        slug_to_diff[slug]
+        for slug in solved_slugs
+        if slug in slug_to_diff
+    ]
+    return Counter(difficulties)
+
+
+def get_target_difficulty_from_profile(diff_counter):
+    if not diff_counter:
+        return "Easy"
+    # If user has solved equal or more Mediums/Hards, bump target difficulty appropriately
+    most_common = diff_counter.most_common()
+    if most_common:
+        return most_common[0][0]
+    return "Easy"
+
+
+def build_user_profile():
+    X, problems, mlb = build_feature_matrix()
+    submissions = get_solved_submissions()
+    if not submissions:
+        return None
+    solved_slugs = [s.problem.slug for s in submissions]
+    return build_user_profile_from_slugs(solved_slugs, X, problems)
+
 
 def get_difficulty_profile():
-
+    X, problems, mlb = build_feature_matrix()
     submissions = get_solved_submissions()
+    solved_slugs = [s.problem.slug for s in submissions]
+    return get_difficulty_profile_from_slugs(solved_slugs, problems)
 
-    difficulties = [
-        submission.problem.difficulty
-        for submission in submissions
-    ]
 
-    return Counter(difficulties)
 def get_target_difficulty():
-
     profile = get_difficulty_profile()
-
-    if not profile:
-        return "Easy"
-
-    return profile.most_common(1)[0][0]
+    return get_target_difficulty_from_profile(profile)
 
 
 if __name__ == "__main__":
-
     profile = get_difficulty_profile()
-
     print("Difficulty profile:")
     print(profile)
     print("Target difficulty:", get_target_difficulty())
+
