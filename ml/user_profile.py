@@ -3,7 +3,7 @@ import os
 import sys
 import numpy as np
 import django
-
+from collections import Counter
 
 # -----------------------------
 # Django setup
@@ -104,15 +104,32 @@ def build_user_profile():
 
     return user_vector
 
+
+
+def get_difficulty_profile():
+
+    submissions = get_solved_submissions()
+
+    difficulties = [
+        submission.problem.difficulty
+        for submission in submissions
+    ]
+
+    return Counter(difficulties)
+def get_target_difficulty():
+
+    profile = get_difficulty_profile()
+
+    if not profile:
+        return "Easy"
+
+    return profile.most_common(1)[0][0]
+
+
 if __name__ == "__main__":
 
-    user_vector = build_user_profile()
+    profile = get_difficulty_profile()
 
-    if user_vector is not None:
-        print("User vector shape:", user_vector.shape)
-
-        print("\nFirst 20 values:")
-        print(user_vector[:20])
-
-        print("\nMinimum:", user_vector.min())
-        print("Maximum:", user_vector.max())
+    print("Difficulty profile:")
+    print(profile)
+    print("Target difficulty:", get_target_difficulty())
