@@ -210,12 +210,7 @@ http://127.0.0.1:8000/api/recommend/for-me/
 * [x] Recency-weighted user profile
 * [x] Difficulty-aware recommendations
 * [x] Personalized recommendation API
-* [ ] React dashboard
-* [ ] Similar-problem API
-* [ ] Topic statistics
-* [ ] Recommendation explanations
-* [ ] Deployment
-* [ ] Automated data refresh
+
 
 ---
 
