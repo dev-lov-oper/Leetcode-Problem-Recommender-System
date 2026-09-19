@@ -234,3 +234,6 @@ Build a practical recommendation system that answers:
 > **"I've solved these problems. What should I solve next?"**
 
 The current version focuses on a **simple, explainable KNN approach** using engineered problem metadata rather than semantic embeddings.
+
+## Deployed URL
+https://leetcode-problem-recommender.onrender.com/
