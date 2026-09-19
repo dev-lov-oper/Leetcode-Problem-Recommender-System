@@ -7,7 +7,7 @@
 The system analyzes your LeetCode solving history and recommends **unsolved problems** based on:
 
 * 🏷️ Problem topics
-* 📊 Difficulty
+* 📊 Difficulty(A/C to majority recent submissions currently)
 * 📈 Acceptance rate
 * 🕒 Recent solving activity
 * 🤖 KNN-based similarity
@@ -56,7 +56,6 @@ The goal is to make problem selection personalized instead of randomly choosing 
 | Database         | SQLite               |
 | Machine Learning | Scikit-learn         |
 | Data Processing  | NumPy                |
-| Model Storage    | Joblib               |
 | Frontend         | React                |
 | Data Source      | LeetCode GraphQL API |
 
@@ -216,8 +215,8 @@ http://127.0.0.1:8000/api/recommend/for-me/
 
 ## 🔮 Future Improvements — V2
 
-* 🎯 Topic diversity
-* 🧩 Better historical submission tracking
+* 🎯 Topic + Difficulty diversity 
+* 🧩 Better historical submission tracking 
 * ⏱️ Solve time and attempt-based features
 * 🧠 Problem-statement embeddings
 * 🔀 Hybrid metadata + embedding similarity
@@ -231,7 +230,7 @@ http://127.0.0.1:8000/api/recommend/for-me/
 
 Build a practical recommendation system that answers:
 
-> **"I've solved these problems. What should I solve next?"**
+> **"I've solved these problems. I want to solve more such similar topic problems"**
 
 The current version focuses on a **simple, explainable KNN approach** using engineered problem metadata rather than semantic embeddings.
 
